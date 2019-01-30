@@ -1,0 +1,1026 @@
+'  -----  Size Constants  -----
+'Window
+windowX=1280
+windowY=720
+windowVariance=128
+
+'Player
+bodyRadius=64
+turretRadius=192
+turretLength=104
+bulletHitRadius=96
+
+'Intro Cinematics
+blackHoleRadius=196
+faceRadius=196
+shardRadius=32
+numberRadius=160
+fightRadius=528
+
+'Boss
+crystalRadius=32
+cShieldRadius=96
+
+'Projectiles
+sawRadius=64
+squareRadius=48
+
+'  -----  Quantity Constants  -----
+' i,j etc. used as counters
+
+'Frames
+MSPF=16
+
+'Player
+accelerationCoeff=5
+decelerationCoeff=3
+speedCap=20
+hitRadius=64
+spinSpeed=3
+spinCoeffSpeed=0.6
+baseHP=5
+fireChargeTime=4
+turretFireLength=52
+
+'Boss
+BossPhaseHealth[1][1]=10
+BossPhaseHealth[1][2]=10
+BossPhaseHealth[2][1]=10
+BossPhaseHealth[2][2]=10
+BossPhaseHealth[3][1]=10
+BossPhaseHealth[3][2]=10
+BossPhaseHealth[4][1]=10
+BossPhaseHealth[4][2]=10
+
+'Hazards
+
+'Saws
+sawMaxSpeed=8
+sawAccSpeed=0.05
+sawRotSpeed=7
+sawAngleVariance=0.15
+sawHitForce=1
+sawDeAccSpeed=0.15
+
+'  -----  Used Variables  -----
+'Controls
+wPressed=0
+aPressed=0
+sPressed=0
+dPressed=0
+mouseClicked=0
+MX=0
+MY=0
+
+'Frames
+lastTime=0
+
+'Player
+TPX=640
+TPY=600
+TVX=0
+TVY=0
+turretRot=0
+bodyRot=0
+recoverTimer=0
+tShakeX=0
+tShakeY=0
+HP=baseHP
+
+'Intro Cinematics
+blackHoleRot=0
+blackHoleRotSpeed=-5
+shardsRot=0
+crystalRot=0
+
+'Boss
+BPX=windowX/2
+BPY=(windowY/2)-100
+BossHP=0
+movementTimer=0
+phase=1
+subPhase=1
+bossWasHit=0
+
+
+'Projectiles
+'saws[]
+numSaws=0
+'sawPX[]
+'sawPY[]
+'sawVX[]
+'sawVY[]
+sawHitRadius=56
+sawWasHit=0
+
+numBalls=0
+numSquares=0
+numSeekers=0
+numMissiles=0
+numTriangles=0
+'lasers maybeeeeeee
+
+'Misc
+shakeX=0
+shakeY=0
+
+
+tempMag=0
+
+tempAng1=0
+tempAng2=0
+
+'Finding Intersect Function
+m=0
+b=0
+discriminant=0
+FX=0
+FY=0
+TX=0
+TY=0
+intersectX=0
+intersectY=0
+intersectFound=0
+targetRadius=0
+
+fireCharge=0
+tempRand=0
+recoveryTimer=0
+bulletHasHit=0
+bulletTargetNum=0
+recoverTimer=0
+HPFadeTimer=0
+deathFireCycle=0
+deathFireFrame=0
+bulletHitX=0
+bulletHitY=0
+
+willRetry=1
+
+overallHit=0
+hitNum=0
+
+
+
+
+GraphicsWindow.Width=windowX-10
+GraphicsWindow.Height=windowY-10
+GraphicsWindow.CanResize=0
+GraphicsWindow.Hide()
+
+BG=Shapes.AddImage(Program.Directory+"/Images/background.png")
+Shapes.Move(BG,-windowVariance,-windowVariance)
+
+'Player
+body=Shapes.AddImage(Program.Directory+"/Images/tankBody.png")
+Shapes.Move(body,TPX-bodyRadius,TPY-bodyRadius)
+turret=Shapes.AddImage(Program.Directory+"/Images/tankTurret.png")
+Shapes.Move(turret,TPX-turretRadius,TPY-turretRadius)
+turretF=Shapes.AddImage(Program.Directory+"/Images/turretFiring.png")
+Shapes.HideShape(turretF)
+turretR=Shapes.AddImage(Program.Directory+"/Images/turretReloading.png")
+Shapes.HideShape(turretR)
+
+'Intro
+blackHole=Shapes.AddImage(Program.Directory+"/Images/blackHole.png")
+Shapes.Move(blackHole,(windowX/2)-blackHoleRadius,(windowY/2)-blackHoleRadius-100)
+Shapes.Zoom(blackHole,0.1,0.1)
+Shapes.HideShape(blackHole)
+For i=1 To 4
+  shards[i]=Shapes.AddImage(Program.Directory+"/Images/crystalShard.png")
+  Shapes.Move(shards[i],-100,-100)
+  'Shapes.HideShape(shards[i])
+EndFor
+For i=1 To 12
+  faceAppear[i]=Shapes.AddImage(Program.Directory+"/Images/evilFaceA"+i+".png")
+  Shapes.Move(faceAppear[i],(windowX/2)-faceRadius,(windowY/2)-faceRadius-100)
+  Shapes.HideShape(faceAppear[i])
+EndFor
+face=Shapes.AddImage(Program.Directory+"/Images/evilFace.png")
+Shapes.Move(face,(windowX/2)-faceRadius,(windowY/2)-faceRadius-100)
+Shapes.HideShape(face)
+
+'Minions
+For i=1 To 4
+  saws[i]=Shapes.AddImage(Program.Directory+"/Images/saw.png")
+  Shapes.HideShape(saws[i])
+EndFor
+
+'sawHIT=Shapes.AddImage(Program.Directory+"/Images/saw_HIT.png")
+'Shapes.HideShape(sawHIT)
+
+'Boss
+crystal=Shapes.AddImage(Program.Directory+"/Images/crystal.png")
+Shapes.Move(crystal,(windowX/2)-crystalRadius,(windowY/2)-crystalRadius-100)
+Shapes.HideShape(crystal)
+cShield=Shapes.AddImage(Program.Directory+"/Images/crystalShield.png")
+Shapes.Move(cShield,(windowX/2)-cShieldRadius,(windowY/2)-cShieldRadius-100)
+Shapes.Zoom(cShield,0.1,0.1)
+Shapes.HideShape(cShield)
+cShieldHIT=Shapes.AddImage(Program.Directory+"/Images/crystalShield_HIT.png")
+Shapes.Move(cShieldHIT,(windowX/2)-cShieldRadius,(windowY/2)-cShieldRadius-100)
+Shapes.HideShape(cShieldHIT)
+
+'Effects
+bulletHit=Shapes.AddImage(Program.Directory+"/Images/bulletHit1.png")
+Shapes.HideShape(bulletHit)
+whiteScreen=Shapes.AddImage(Program.Directory+"/Images/whiteScreen.png")
+Shapes.SetOpacity(whiteScreen,0)
+For i=1 To 3
+  CD[4-i]=Shapes.AddImage(Program.Directory+"/Images/countdown"+i+".png")
+  Shapes.Move(CD[4-i],(windowX/2)-numberRadius,(windowY/2)-numberRadius)
+  Shapes.Zoom(CD[4-i],0.1,0.1)
+  Shapes.HideShape(CD[4-i])
+EndFor
+CD[4]=Shapes.AddImage(Program.Directory+"/Images/countdownFight.png")
+Shapes.Move(CD[4],(windowX/2)-fightRadius,(windowY/2)-numberRadius)
+Shapes.Zoom(CD[4],0.1,0.1)
+Shapes.HideShape(CD[4])
+
+
+
+
+
+GraphicsWindow.KeyUp=kUp
+GraphicsWindow.KeyDown=kDown
+GraphicsWindow.MouseUp=mUp
+GraphicsWindow.MouseDown=mDown
+
+GraphicsWindow.Show()
+
+
+
+'fullIntro()
+
+
+Shapes.ShowShape(crystal)
+Shapes.ShowShape(cShield)
+Shapes.Zoom(cShield,1,1)
+
+
+
+
+While(willRetry=1)
+  
+  
+  
+  movementTimer=0
+  
+  
+  While(HP>0)
+    lastTime=Clock.ElapsedMilliseconds
+    
+    'Get Mouse Coordinates
+    MX=GraphicsWindow.MouseX
+    MY=GraphicsWindow.MouseY
+    
+    'Adjust Position Tank
+    moveTank()
+    
+    'Adjust boss position & graphics
+    moveBossPhase1()
+    
+    'Adjust minion position & graphics
+    updateSaws()
+    
+    '[NOT REALLY I GUESS BUT KEEPING THIS HERE] Create New Minions
+    
+    'Fire
+    If(fireCharge<fireChargeTime)Then
+      fireCharge=fireCharge+1
+    EndIf
+    If(mouseClicked=1)Then
+      If(fireCharge=fireChargeTime)Then
+        fireCharge=0
+        
+        overallHit=0
+        hitNum=0
+        
+        CheckBossHitPhase1()
+        checkSawHit()
+        
+        If(overallHit>0)Then
+          If(overallHit=1)Then
+            Shapes.Move(cShieldHIT,BPX-cShieldRadius,BPY-cShieldRadius)
+            Shapes.ShowShape(cShieldHIT)
+          Else
+            sawShot()
+          EndIf
+          Shapes.Move(bulletHit,bulletHitX-bulletHitRadius,bulletHitY-bulletHitRadius)
+        Else
+          Shapes.HideShape(cShieldHIT)
+          bulletHitWallAnimation()
+        EndIf
+        Shapes.ShowShape(bulletHit)
+        Shapes.Rotate(bulletHit,180+turretRot)
+      Else
+        Shapes.HideShape(bulletHit)
+        Shapes.HideShape(cShieldHIT)
+      EndIf
+    Else
+      Shapes.HideShape(bulletHit)
+      Shapes.HideShape(cShieldHIT)
+    EndIf
+    
+    
+    'Consequences of firing
+      'What is hit
+      'Effect of that
+      
+    If(BossHP=0)Then
+      
+    EndIf
+    
+    'Recovery
+      
+    'Detect hit
+    
+    'Consequences of hit
+    
+    'Update tank graphics
+    updateTank()
+    
+    
+    '
+    movementTimer=movementTimer+1
+    
+    While(Clock.ElapsedMilliseconds-lastTime<MSPF)
+    Endwhile
+    lastTime=lastTime+MSPF
+  EndWhile
+  
+  
+EndWhile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sub moveTank
+  
+  'Calculating P/V for X
+  If(Math.Abs(TVX)>decelerationCoeff)Then
+    TVX=TVX-(Math.Abs(TVX)/TVX*decelerationCoeff*(1-(0.3*Math.Abs(sPressed-wPressed))))
+  Else
+    TVX=0
+  EndIf
+  TVX=TVX+(accelerationCoeff*(dPressed-aPressed-((dPressed-aPressed)*Math.Abs(sPressed-wPressed)*0.3)))
+  If(Math.Abs(TVX)>speedCap)Then
+    TVX=TVX/Math.Abs(TVX)*speedCap
+  EndIf
+  TPX=TPX+TVX
+  If(TPX+bodyRadius>windowX)Then
+    TPX=windowX-bodyRadius
+  ElseIf(TPX-bodyRadius<0)Then
+    TPX=bodyRadius
+  EndIf
+  
+  'Calculating P/V for Y
+  If(Math.Abs(TVY)>decelerationCoeff)Then
+    TVY=TVY-(Math.Abs(TVY)/TVY*decelerationCoeff*(1-(0.3*Math.Abs(dPressed-aPressed))))
+  Else
+    TVY=0
+  EndIf
+  TVY=TVY+(accelerationCoeff*(sPressed-wPressed-((sPressed-wPressed)*Math.Abs(dPressed-aPressed)*0.3)))
+  If(Math.Abs(TVY)>speedCap)Then
+    TVY=TVY/Math.Abs(TVY)*speedCap
+  EndIf
+  TPY=TPY+TVY
+  If(TPY+bodyRadius>windowY)Then
+    TPY=windowY-bodyRadius
+  ElseIf(TPY-bodyRadius<0)Then
+    TPY=bodyRadius
+  EndIf
+  
+  'Moving & Rotating Body
+  
+  'Moving & Rotating Turret
+  If(TPX<>MX)Then
+    turretRot=Math.ArcTan((MY-TPY)/(MX-TPX))*180/Math.Pi+90
+    If(TPX>MX)Then
+      turretRot=turretRot+180
+    EndIf
+  ElseIf(TPY<MY)Then
+    turretRot=180
+  Else
+    turretRot=0
+  EndIf
+  Shapes.Move(turret,TPX-turretRadius,TPY-turretRadius)
+  Shapes.Move(turretF,TPX-turretRadius,TPY-turretRadius)
+  Shapes.Move(turretR,TPX-turretRadius,TPY-turretRadius)
+EndSub
+
+
+Sub moveBossPhase1
+  BPX=(windowX/2)+(500*Math.Sin(movementTimer*Math.Pi/600))
+  If(movementTimer<150)Then
+    BPY=260-(130*Math.Sin(movementTimer*Math.Pi/300))
+  Else
+    BPY=360-(230*Math.Sin(movementTimer*Math.Pi/300))
+  EndIf
+  If(movementTimer<=1050)Then
+    If(movementTimer=150 Or movementTimer=450 Or movementTimer=750 Or movementTimer=1050)Then
+      createSaw()
+    EndIf 
+  EndIf
+  Shapes.Move(crystal,BPX-crystalRadius,BPY-crystalRadius)
+  Shapes.Move(cShield,BPX-cShieldRadius,BPY-cShieldRadius)
+EndSub
+
+Sub CheckBossHitPhase1
+  targetRadius=cShieldRadius
+  TX=BPX
+  TY=BPY
+  getIntersect()
+  If(intersectFound=1)Then
+    overallHit=1
+    bulletHitX=intersectX
+    bulletHitY=intersectY
+  EndIf
+EndSub
+
+
+
+
+Sub updateTank
+  bodyRot=bodyRot+spinSpeed+(spinCoeffSpeed*Math.SquareRoot((TVX*TVX)+(TVY*TVY)))
+  If(bodyRot>360)Then
+    bodyRot=bodyRot-360
+  EndIf
+  Shapes.Rotate(body,bodyRot)
+  Shapes.Move(body,TPX-bodyRadius,TPY-bodyRadius)
+  Shapes.Rotate(turret,turretRot)
+  If(mouseClicked=1)Then
+    Shapes.ShowShape(turretR)
+    Shapes.Rotate(turretR,turretRot)
+    If(fireCharge=0)Then
+      Shapes.ShowShape(turretF)
+      Shapes.Rotate(turretF,turretRot)
+    Else
+      Shapes.HideShape(turretF)
+    EndIf
+  Else
+    Shapes.HideShape(turretF)
+    Shapes.HideShape(turretR)
+  EndIf
+  
+EndSub
+
+
+
+'Uses IntersectX/Y, 
+
+Sub bulletHitWallAnimation
+  If(turretRot<270)Then
+    If(turretRot<180)Then
+      If(turretRot<90)Then
+        If(turretRot>0)Then
+          intersectX=((-TPY)*(MX-TPX)/(MY-TPY))+TPX
+          intersectY=((windowX-TPX)*(MY-TPY)/(MX-TPX))+TPY
+          If(Math.SquareRoot(Math.Power(TPX-windowX,2)+Math.Power(intersectY-TPY,2))<=Math.SquareRoot(Math.Power(TPY,2)+Math.Power(intersectX-TPX,2)))Then
+            Shapes.Move(bulletHit,windowX-bulletHitRadius,intersectY-bulletHitRadius)
+          Else
+            Shapes.Move(bulletHit,intersectX-bulletHitRadius,-bulletHitRadius)
+          EndIf
+        Else
+          Shapes.Move(bulletHit,TPX-bulletHitRadius,-bulletHitRadius)
+        EndIf
+      Else
+        If(turretRot>90)Then
+          intersectX=((windowY-TPY)*(MX-TPX)/(MY-TPY))+TPX
+          intersectY=((windowX-TPX)*(MY-TPY)/(MX-TPX))+TPY
+          If(Math.SquareRoot(Math.Power(TPX-windowX,2)+Math.Power(intersectY-TPY,2))<=Math.SquareRoot(Math.Power(TPY-windowY,2)+Math.Power(intersectX-TPX,2)))Then
+            Shapes.Move(bulletHit,windowX-bulletHitRadius,intersectY-bulletHitRadius)
+          Else
+            Shapes.Move(bulletHit,intersectX-bulletHitRadius,windowY-bulletHitRadius)
+          EndIf
+        Else
+          Shapes.Move(bulletHit,windowX-bulletHitRadius,TPY-bulletHitRadius)
+        EndIf
+      EndIf
+    Else
+      If(turretRot>180)Then
+        intersectX=((windowY-TPY)*(MX-TPX)/(MY-TPY))+TPX
+        intersectY=((-TPX)*(MY-TPY)/(MX-TPX))+TPY
+        If(Math.SquareRoot(Math.Power(TPX,2)+Math.Power(intersectY-TPY,2))<=Math.SquareRoot(Math.Power(TPY-windowY,2)+Math.Power(intersectX-TPX,2)))Then
+          Shapes.Move(bulletHit,-bulletHitRadius,intersectY-bulletHitRadius)
+        Else
+          Shapes.Move(bulletHit,intersectX-bulletHitRadius,windowY-bulletHitRadius)
+        EndIf
+      Else
+        Shapes.Move(bulletHit,TPX-bulletHitRadius,windowY-bulletHitRadius)
+      EndIf
+    EndIf
+  Else
+    If(turretRot>270)Then
+      intersectX=((-TPY)*(MX-TPX)/(MY-TPY))+TPX
+      intersectY=((-TPX)*(MY-TPY)/(MX-TPX))+TPY
+      If(Math.SquareRoot(Math.Power(TPX,2)+Math.Power(intersectY-TPY,2))<=Math.SquareRoot(Math.Power(TPY,2)+Math.Power(intersectX-TPX,2)))Then
+        Shapes.Move(bulletHit,-bulletHitRadius,intersectY-bulletHitRadius)
+      Else
+        Shapes.Move(bulletHit,intersectX-bulletHitRadius,-bulletHitRadius)
+      EndIf
+    Else
+      Shapes.Move(bulletHit,-bulletHitRadius,TPY-bulletHitRadius)
+    EndIf
+  EndIf
+EndSub
+
+
+
+'Uses: Tank stuff
+'Arguements: targetRadius, TX/Y, 
+'Outputs: IntersectFound, intersectX/Y, 
+Sub getIntersect
+  intersectFound=0
+  FX=TPX+(turretLength*Math.Sin(turretRot*Math.Pi/180))
+  FY=TPY-(turretLength*Math.Cos(turretRot*Math.Pi/180))
+  'Shapes.Move(testArrow,FX,FY)
+  If(Math.Power(TX-FX,2)+Math.Power(TY-FY,2)<=targetRadius*targetRadius)Then
+    intersectX=FX
+    intersectY=FY
+    intersectFound=1
+  Else
+    If((turretRot/90)-Math.Floor(turretRot/90)=0)Then
+      If(turretRot=0 Or turretRot=180)Then
+        If(Math.Abs(TPX-TX)<=targetRadius)Then
+          intersectX=TPX
+          intersectY=TY+((TPY-TY)/Math.Abs(TPY-TY)*Math.SquareRoot(Math.Power(targetRadius,2)-Math.Power(TPX-TX,2)))
+          'Shapes.Move(testArrow,intersectX,intersectY)
+          'Program.Delay(1000)
+          If((intersectY-FY)*(FY-TPY)>=0)Then
+            intersectFound=1
+          EndIf
+        EndIf
+      Else
+        If(Math.Abs(TPY-TY)<=targetRadius)Then
+          intersectX=TX+((TPX-TX)/Math.Abs(TPX-TX)*Math.SquareRoot(Math.Power(targetRadius,2)-Math.Power(TPY-TY,2)))
+          intersectY=TPY
+          'Shapes.Move(testArrow,intersectX,intersectY)
+          'Program.Delay(1000)
+          If((intersectX-FX)*(FX-TPX)>=0)Then
+            intersectFound=1
+          EndIf
+        EndIf
+      EndIf
+    Else
+      m=(MY-TPY)/(MX-TPX)
+      b=TPY-(m*TPX)
+      discriminant=Math.Power((m*(b-TY))-TX,2)-(Math.Power(m,2)+1)*(Math.Power(b-TY,2)+Math.Power(TX,2)-Math.Power(targetRadius,2))
+      If(discriminant>=0)Then
+        intersectX=((TX+(m*(TY-b)))+(((TPX-MX)/Math.Abs(TPX-MX))*Math.SquareRoot(discriminant)))/(Math.Power(m,2)+1)
+        intersectY=((((b+(m*TX))/Math.Power(m,2))+TY)+(((TPY-MY)/Math.Abs(TPY-MY))*Math.SquareRoot(Math.Power(((b+(m*TX))/Math.Power(m,2))+TY,2)-(((1/Math.Power(m,2))+1)*(Math.Power((b/m)+TX,2)+Math.Power(TY,2)-Math.Power(targetRadius,2))))))/((1/Math.Power(m,2))+1)
+        'Shapes.Move(testArrow,intersectX,intersectY)
+        'Program.Delay(1000)
+        If((intersectX-TPX)*(MX-TPX)>=0 And (intersectX-FX)*(FX-TPX)>=0)Then
+          intersectFound=1
+        EndIf
+      EndIf
+    EndIf
+  EndIf
+EndSub
+
+
+
+Sub createSaw
+  numSaws=numSaws+1
+  Shapes.ShowShape(saws[numSaws])
+  Shapes.Move(saws[numSaws],BPX-sawRadius,BPY-sawRadius)
+  sawPX[numSaws]=BPX
+  sawPY[numSaws]=BPY
+  sawVX[numSaws]=0
+  sawVY[numSaws]=0
+  'If(BPX=TPX)Then
+    'If(BPY=TPY)Then
+      'sawVY[numSaws]=0
+    'Else
+      'If(BPY>TPY)Then
+        'sawVY[numSaws]=-sawMaxSpeed
+      'Else
+        'sawVY[numSaws]=sawMaxSpeed
+      'EndIf
+    'EndIf
+    'sawVX[numSaws]=0
+  'Else
+    'sawVX[numSaws]=(TPX-BPX)*sawMaxSpeed/Math.SquareRoot(((BPX-TPX)*(BPX-TPX))+((BPY-TPY)*(BPY-TPY)))
+    'sawVY[numSaws]=(TPY-BPY)*sawMaxSpeed/Math.SquareRoot(((BPX-TPX)*(BPX-TPX))+((BPY-TPY)*(BPY-TPY)))
+  'EndIf
+  sawRot[numSaws]=0
+EndSub
+
+Sub updateSaws
+  For i=1 To numSaws
+    
+    tempMag=Math.SquareRoot((sawVX[i]*sawVX[i])+(sawVY[i]*sawVY[i]))
+    If(tempMag<sawMaxSpeed)Then
+      If(sawVX[i]=0 And sawVY[i]=0)Then
+        sawVX[i]=(TPX-sawPX[i])*sawAccSpeed/Math.SquareRoot(((sawPX[i]-TPX)*(sawPX[i]-TPX))+((sawPY[i]-TPY)*(sawPY[i]-TPY)))
+        sawVY[i]=(TPY-sawPY[i])*sawAccSpeed/Math.SquareRoot(((sawPX[i]-TPX)*(sawPX[i]-TPX))+((sawPY[i]-TPY)*(sawPY[i]-TPY)))
+      ElseIf(tempMag<sawMaxSpeed-sawAccSpeed)Then
+        sawVX[i]=sawVX[i]+(sawVX[i]/tempMag*sawAccSpeed)
+        sawVY[i]=sawVY[i]+(sawVY[i]/tempMag*sawAccSpeed)
+      Else
+        sawVX[i]=sawVX[i]/tempMag*sawMaxSpeed
+        sawVY[i]=sawVY[i]/tempMag*sawMaxSpeed
+      EndIf
+    Else
+      If(tempMag>sawMaxSpeed+sawDeAccSpeed)Then
+        sawVX[i]=sawVX[i]-(sawVX[i]/tempMag*sawAccSpeed)
+        sawVY[i]=sawVY[i]-(sawVY[i]/tempMag*sawAccSpeed)
+      Else
+        sawVX[i]=sawVX[i]/tempMag*sawMaxSpeed
+        sawVY[i]=sawVY[i]/tempMag*sawMaxSpeed
+      EndIf
+    EndIf
+    
+    sawPX[i]=sawPX[i]+sawVX[i]
+    sawPY[i]=sawPY[i]+sawVY[i]
+    If(sawPX[i]<sawRadius)Then
+      sawPX[i]=sawRadius
+      sawVX[i]=-sawVX[i]
+      redirectSaw()
+    ElseIf(sawPX[i]>windowX-sawRadius)Then
+      sawPX[i]=windowX-sawRadius
+      sawVX[i]=-sawVX[i]
+      redirectSaw()
+    EndIf
+    If(sawPY[i]<sawRadius)Then
+      sawPY[i]=sawRadius
+      sawVY[i]=-sawVY[i]
+      redirectSaw()
+    ElseIf(sawPY[i]>windowY-sawRadius)Then
+      sawPY[i]=windowY-sawRadius
+      sawVY[i]=-sawVY[i]
+      redirectSaw()
+    EndIf
+    Shapes.Move(saws[i],sawPX[i]-sawRadius,sawPY[i]-sawRadius)
+    
+    sawRot[i]=sawRot[i]+sawRotSpeed
+    Shapes.Rotate(saws[i],sawRot[i])
+  EndFor
+EndSub
+
+Sub redirectSaw
+  If(sawVX[i]=0)Then
+    If(sawVY[i]>0)Then
+      tempAng1=Math.Pi/2
+    ElseIf(sawVY[i]<0)Then
+      tempAng1=Math.Pi*3/2
+    Else
+      tempAng1=0
+    EndIf
+  Else
+    tempAng1=Math.ArcTan(sawVY[i]/sawVX[i])
+    If(sawVX[i]<0)Then
+      tempAng1=tempAng1+Math.Pi
+    EndIf
+    If(tempAng1<0)Then
+      tempAng1=tempAng1+(Math.Pi*2)
+    EndIf
+  EndIf
+  
+  If(sawPX[i]=TPX)Then
+    If(sawPY[i]>TPY)Then
+      tempAng2=Math.Pi/2
+    ElseIf(sawPY[i]<TPY)Then
+      tempAng2=Math.Pi*3/2
+    Else
+      tempAng2=0
+    EndIf
+  Else
+    tempAng2=Math.ArcTan((sawPY[i]-TPY)/(sawPX[i]-TPX))
+    If(sawPX[i]>TPX)Then
+      tempAng2=tempAng2+Math.Pi
+    EndIf
+    If(tempAng2<0)Then
+      tempAng2=tempAng2+(Math.Pi*2)
+    EndIf
+  EndIf
+  
+  tempMag=Math.SquareRoot((sawVX[i]*sawVX[i])+(sawVY[i]*sawVY[i]))
+  If(Math.Pi-Math.Abs(Math.Abs(tempAng1-tempAng2)-Math.Pi)<sawAngleVariance)Then
+    sawVX[i]=(TPX-sawPX[i])*tempMag/Math.SquareRoot(((sawPX[i]-TPX)*(sawPX[i]-TPX))+((sawPY[i]-TPY)*(sawPY[i]-TPY)))
+    sawVY[i]=(TPY-sawPY[i])*tempMag/Math.SquareRoot(((sawPX[i]-TPX)*(sawPX[i]-TPX))+((sawPY[i]-TPY)*(sawPY[i]-TPY)))
+  Else
+    If((Math.Abs(tempAng2-tempAng1)<Math.Pi And tempAng1<tempAng2) Or (Math.Abs(tempAng2-tempAng1)>Math.Pi And tempAng1>tempAng2))Then
+      tempAng1=tempAng1+sawAngleVariance
+    Else
+      tempAng1=tempAng1-sawAngleVariance
+    EndIf
+    sawVX[i]=tempMag*Math.Cos(tempAng1)
+    sawVY[i]=tempMag*Math.Sin(tempAng1)
+  EndIf
+EndSub
+
+Sub checkSawHit
+  targetRadius=sawHitRadius
+  For i=1 To numSaws
+    TX=sawPX[i]
+    TY=sawPY[i]
+    getIntersect()
+    If(intersectFound=1 And (overallHit=0 Or Math.Power(TPX-intersectX,2)+Math.Power(TPY-intersectY,2)<Math.Power(TPX-bulletHitX,2)+Math.Power(TPY-bulletHitY,2)))Then
+      overallHit=2
+      bulletHitX=intersectX
+      bulletHitY=intersectY
+      hitNum=i
+    EndIf
+  EndFor
+EndSub
+
+Sub sawShot
+  If(MX=TPX)Then
+    tempAng1=Math.Pi/2
+  Else
+    tempAng1=Math.ArcTan((MY-TPY)/(MX-TPX))
+  EndIf
+  
+  If(sawPX[hitNum]=bulletHitX)Then
+    tempAng2=Math.Pi/2
+  Else
+    tempAng2=Math.ArcTan((sawPY[hitNum]-bulletHitY)/(sawPX[hitNum]-bulletHitX))
+  EndIf
+  
+  sawVX[hitNum]=sawVX[hitNum]+((sawPX[hitNum]-bulletHitX)*sawHitForce*Math.Sin(Math.Abs(Math.Abs(tempAng1-tempAng2)-(Math.Pi/2)))/sawHitRadius)
+  sawVY[hitNum]=sawVY[hitNum]+((sawPY[hitNum]-bulletHitY)*sawHitForce*Math.Sin(Math.Abs(Math.Abs(tempAng1-tempAng2)-(Math.Pi/2)))/sawHitRadius)
+  
+EndSub
+
+'Sub removeSawData
+  
+'EndSub
+
+
+
+Sub fullIntro
+  For i=1 To 50
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  Shapes.ShowShape(blackHole)
+  For i=1 To 150
+    blackHoleRot=blackHoleRot-5
+    Shapes.Rotate(blackHole,blackHoleRot)
+    Shapes.Zoom(blackHole,Math.SquareRoot(i/150),Math.SquareRoot(i/150))
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 50
+    blackHoleRot=blackHoleRot-5
+    Shapes.Rotate(blackHole,blackHoleRot)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 12
+    Shapes.HideShape(faceAppear[i])
+    For j=1 To 3
+      blackHoleRot=blackHoleRot-5
+      Shapes.Rotate(blackHole,blackHoleRot)
+      bodyRot=bodyRot+spinSpeed
+      If(bodyRot>360)Then
+        bodyRot=bodyRot-360
+      EndIf
+      Shapes.Rotate(body,bodyRot)
+      Program.Delay(MSPF)
+    EndFor
+    Shapes.ShowShape(faceAppear[i])
+  EndFor
+  Shapes.ShowShape(face)
+  For i=1 To 125
+    blackHoleRot=blackHoleRot-5
+    Shapes.Rotate(blackHole,blackHoleRot)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  Shapes.ShowShape(faceAppear[10])
+  Shapes.HideShape(face)
+  For i=12 To 1 Step -1
+    Shapes.ShowShape(faceAppear[i])
+    For j=1 To 2
+      blackHoleRot=blackHoleRot-5
+      Shapes.Rotate(blackHole,blackHoleRot)
+      bodyRot=bodyRot+spinSpeed
+      If(bodyRot>360)Then
+        bodyRot=bodyRot-360
+      EndIf
+      Shapes.Rotate(body,bodyRot)
+      Program.Delay(MSPF)
+    EndFor
+    Shapes.HideShape(faceAppear[i])
+  EndFor
+  For i=1 To 30
+    blackHoleRot=blackHoleRot-5
+    Shapes.Rotate(blackHole,blackHoleRot)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 300
+    shakeX=Math.GetRandomNumber(7)-4
+    shakeY=Math.GetRandomNumber(7)-4
+    Shapes.Move(BG,shakeX-windowVariance,shakeY-windowVariance)
+    Shapes.Move(body,TPX+shakeX-bodyRadius,TPY+shakeY-bodyRadius)
+    Shapes.Move(turret,TPX+shakeX-turretRadius,TPY+shakeY-turretRadius)
+    For j=1 To 4
+      Shapes.Move(shards[j],(windowX/2)+((((300-i)*(300-i)/100)+blackHoleRadius)*Math.Cos((shardsRot/180*Math.Pi)+j/2*Math.Pi))-shardRadius,(windowY/2)-100+((((300-i)*(300-i)/100)+blackHoleRadius)*Math.Sin((shardsRot/180*Math.Pi)+j/2*Math.Pi))-shardRadius)
+      Shapes.Rotate(shards[j],j*90+shardsRot-90)
+    EndFor
+    shardsRot=shardsRot-3
+    blackHoleRot=blackHoleRot-5
+    Shapes.Rotate(blackHole,blackHoleRot)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 300
+    shakeX=Math.GetRandomNumber(11)-6
+    shakeY=Math.GetRandomNumber(11)-6
+    Shapes.Move(BG,shakeX-windowVariance,shakeY-windowVariance)
+    Shapes.Move(body,TPX+shakeX-bodyRadius,TPY+shakeY-bodyRadius)
+    Shapes.Move(turret,TPX+shakeX-turretRadius,TPY+shakeY-turretRadius)
+    For j=1 To 4
+      Shapes.Move(shards[j],(windowX/2)+(((300-i)/300*blackHoleRadius)*Math.Cos((shardsRot/180*Math.Pi)+j/2*Math.Pi))-shardRadius,(windowY/2)-100+(((300-i)/300*blackHoleRadius)*Math.Sin((shardsRot/180*Math.Pi)+j/2*Math.Pi))-shardRadius)
+      Shapes.Rotate(shards[j],j*90+shardsRot-90)
+    EndFor
+    shardsRot=shardsRot-3-(i/20)
+    blackHoleRot=blackHoleRot-5-(i/50)
+    Shapes.SetOpacity(whiteScreen,(i-260)*2.5)
+    Shapes.Rotate(blackHole,blackHoleRot)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  Program.Delay(500)
+  Shapes.Move(BG,-windowVariance,-windowVariance)
+  Shapes.Move(body,TPX-bodyRadius,TPY-bodyRadius)
+  Shapes.Move(turret,TPX-turretRadius,TPY-turretRadius)
+  Shapes.HideShape(blackHole)
+  For j=1 To 4
+    Shapes.HideShape(shards[j])
+  EndFor
+  Shapes.ShowShape(crystal)
+  Shapes.SetOpacity(whiteScreen,0)
+  For i=200 To 0 Step -1
+    crystalRot=crystalRot-(i/20)
+    Shapes.Rotate(crystal,i*i/20)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 40
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  Shapes.ShowShape(cShield)
+  For i=2 To 30
+    Shapes.Zoom(cShield,(-i*(i-45))/450,(-i*(i-45))/450)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 3
+    Shapes.ShowShape(cShieldHIT)
+    For j=1 To 2
+      bodyRot=bodyRot+spinSpeed
+      If(bodyRot>360)Then
+        bodyRot=bodyRot-360
+      EndIf
+      Shapes.Rotate(body,bodyRot)
+      Program.Delay(MSPF)
+    EndFor
+    Shapes.HideShape(cShieldHIT)
+    For j=1 To 2
+      bodyRot=bodyRot+spinSpeed
+      If(bodyRot>360)Then
+        bodyRot=bodyRot-360
+      EndIf
+      Shapes.Rotate(body,bodyRot)
+      Program.Delay(MSPF)
+    EndFor
+  EndFor
+  For i=1 To 20
+    blackHoleRot=blackHoleRot-5
+    Shapes.Rotate(blackHole,blackHoleRot)
+    bodyRot=bodyRot+spinSpeed
+    If(bodyRot>360)Then
+      bodyRot=bodyRot-360
+    EndIf
+    Shapes.Rotate(body,bodyRot)
+    Program.Delay(MSPF)
+  EndFor
+  For i=1 To 4
+    Shapes.ShowShape(CD[i])
+    For j=1 To 10
+      Shapes.Zoom(CD[i],(j*j/110)+0.1,(j*j/110)+0.1)
+      bodyRot=bodyRot+spinSpeed
+      If(bodyRot>360)Then
+        bodyRot=bodyRot-360
+      EndIf
+      Shapes.Rotate(body,bodyRot)
+      Program.Delay(MSPF)
+    EndFor
+    For j=1 To 20
+      Shapes.Zoom(CD[i],(j/100)+1,(j/100)+1)
+      Shapes.SetOpacity(CD[i],-10*j+200)
+      bodyRot=bodyRot+spinSpeed
+      If(bodyRot>360)Then
+        bodyRot=bodyRot-360
+      EndIf
+      Shapes.Rotate(body,bodyRot)
+      Program.Delay(MSPF)
+    EndFor
+    Shapes.HideShape(CD[i])
+  EndFor
+EndSub
+
+
+
+Sub kDown
+  If GraphicsWindow.LastKey="W" Then 
+    wPressed=1
+  ElseIf GraphicsWindow.LastKey="S" Then
+    sPressed=1
+  ElseIf GraphicsWindow.LastKey="A" Then
+    aPressed=1
+  ElseIf GraphicsWindow.LastKey="D" Then
+    dPressed=1
+  EndIf
+EndSub
+
+Sub kUp
+  If GraphicsWindow.LastKey="W" Then 
+    wPressed=0
+  ElseIf GraphicsWindow.LastKey="S" Then
+    sPressed=0
+  ElseIf GraphicsWindow.LastKey="A" Then
+    aPressed=0
+  ElseIf GraphicsWindow.LastKey="D" Then
+    dPressed=0
+  EndIf
+EndSub
+
+Sub mDown
+  mouseClicked=1
+EndSub
+
+Sub mUp
+  mouseClicked=0
+EndSub
