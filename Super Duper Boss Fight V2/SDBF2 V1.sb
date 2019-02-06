@@ -41,6 +41,8 @@ spinCoeffSpeed=0.6
 baseHP=5
 fireChargeTime=4
 turretFireLength=52
+recoverTime=150
+HPfadeTime=50
 
 'Boss
 BossPhaseHealth[1][1]=10
@@ -59,7 +61,7 @@ sawMaxSpeed=8
 sawAccSpeed=0.05
 sawRotSpeed=7
 sawAngleVariance=0.15
-sawHitForce=1
+sawHitForce=1.5
 sawDeAccSpeed=0.15
 
 '  -----  Used Variables  -----
@@ -145,11 +147,8 @@ targetRadius=0
 
 fireCharge=0
 tempRand=0
-recoveryTimer=0
 bulletHasHit=0
 bulletTargetNum=0
-recoverTimer=0
-HPFadeTimer=0
 deathFireCycle=0
 deathFireFrame=0
 bulletHitX=0
@@ -159,6 +158,7 @@ willRetry=1
 
 overallHit=0
 hitNum=0
+tankHit=0
 
 
 
@@ -180,6 +180,10 @@ turretF=Shapes.AddImage(Program.Directory+"/Images/turretFiring.png")
 Shapes.HideShape(turretF)
 turretR=Shapes.AddImage(Program.Directory+"/Images/turretReloading.png")
 Shapes.HideShape(turretR)
+
+For i=0 To 5
+  health[i]=Shapes.AddImage(Program.Directory+"/Images/health"+i+".png")
+EndFor
 
 'Intro
 blackHole=Shapes.AddImage(Program.Directory+"/Images/blackHole.png")
@@ -331,11 +335,16 @@ While(willRetry=1)
       
     EndIf
     
-    'Recovery
-      
-    'Detect hit
-    
-    'Consequences of hit
+    'Recovery & Hit detection
+    If(recoverTimer>0)Then
+      recoverTimer=recoverTimer-1
+    Else
+      CheckTankHitPhase1()
+      If(tankHit=1)Then
+        HP=HP-1
+        recoverTimer=recoverTime
+      EndIf
+    EndIf
     
     'Update tank graphics
     updateTank()
@@ -463,7 +472,22 @@ Sub CheckBossHitPhase1
   EndIf
 EndSub
 
-
+Sub CheckTankHitPhase1
+  tankHit=0
+  
+  'TextWindow.WriteLine(Math.Power(BPX-TPX,2)+Math.Power(BPY-TPY,2))
+  'TextWindow.WriteLine(bodyRadius+cShieldRadius)
+  If(Math.Power(BPX-TPX,2)+Math.Power(BPY-TPY,2)<Math.Power(bodyRadius+cShieldRadius,2))Then
+    tankHit=1
+  Else
+    For i=1 To numSaws
+      If(Math.Power(sawPX[i]-TPX,2)+Math.Power(sawPY[i]-TPY,2)<Math.Power(bodyRadius+sawHitRadius,2))Then
+        tankHit=1
+        i=100
+      EndIf
+    EndFor
+  EndIf
+EndSub
 
 
 Sub updateTank
